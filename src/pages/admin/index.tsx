@@ -1,25 +1,57 @@
 import { Header } from "../../components/Header"
 import { Input } from "../../components/input"
-import { useState } from "react"
-import{FiTrash} from 'react-icons/fi'
+import { useState, type FormEvent } from "react"
+import { FiTrash } from "react-icons/fi"
+import { db } from "../../services/firebaseConnectio"
+import { toast } from "react-toastify"
+import { addDoc, collection } from "firebase/firestore"
+
 export function Admin() {
   const [input, setInput] = useState("")
   const [url, setUrl] = useState("")
   const [cor, setCor] = useState("#ffffff")
   const [backgroundcolor, setBackgroundcolor] = useState("#18181b")
 
+  async function handleRegister(e: FormEvent) {
+    e.preventDefault()
+
+    if (input === "" || url === "") {
+      toast.warning("Preencha todos os campos")
+      return
+    }
+
+    try {
+      await addDoc(collection(db, "links"), {
+        name: input,
+        url,
+        bg: backgroundcolor,
+        color: cor,
+        created: new Date()
+      })
+
+      setInput("")
+      setUrl("")
+      toast.success("Cadastro realizado com sucesso!")
+    } catch (error) {
+      toast.error("Erro ao cadastrar link")
+    }
+  }
+
   return (
     <div className="flex flex-col items-center min-h-screen pb-7 px-2">
       <Header />
 
-      <form className="flex flex-col mt-8 mb-3 w-full max-w-xl">
+      <form
+        onSubmit={handleRegister}
+        className="flex flex-col mt-8 mb-3 w-full max-w-xl"
+      >
         <label className="text-white font-medium mt-2 mb-2">
           Nome do link
         </label>
         <Input
           placeholder="Digite o nome do link..."
           value={input}
-          onChange={(event) => setInput(event.target.value)}
+          onChange={(e) => setInput(e.target.value)}
         />
 
         <label className="text-white font-medium mt-4 mb-2">
@@ -29,7 +61,7 @@ export function Admin() {
           type="url"
           placeholder="Digite a URL..."
           value={url}
-          onChange={(event) => setUrl(event.target.value)}
+          onChange={(e) => setUrl(e.target.value)}
         />
 
         <section className="flex my-4 gap-5">
@@ -40,7 +72,7 @@ export function Admin() {
             <input
               type="color"
               value={cor}
-              onChange={(event) => setCor(event.target.value)}
+              onChange={(e) => setCor(e.target.value)}
             />
 
             <label className="text-white font-medium">
@@ -49,33 +81,22 @@ export function Admin() {
             <input
               type="color"
               value={backgroundcolor}
-              onChange={(event) =>
-                setBackgroundcolor(event.target.value)
-              }
+              onChange={(e) => setBackgroundcolor(e.target.value)}
             />
           </div>
         </section>
 
-        {input !== "" && (
-          <div className="flex flex-col items-center justify-start mb-7 p-2 border-gray-100/25 border rounded-md">
-            <label className="text-white font-medium mt-2 mb-2">
+        {input && (
+          <div className="flex flex-col items-center mb-7 p-2 border border-gray-100/25 rounded-md">
+            <label className="text-white font-medium mb-2">
               Veja como está ficando
             </label>
 
             <article
-              className="w-11/12 max-w-lg flex flex-col items-center justify-center rounded px-1 py-3"
-              style={{
-                backgroundColor: backgroundcolor,
-                marginTop: 8,
-                marginBottom: 8
-              }}
+              className="w-11/12 max-w-lg flex justify-center rounded px-1 py-3"
+              style={{ backgroundColor: backgroundcolor }}
             >
-              <p
-                className="text-base font-medium"
-                style={{ color: cor }}
-              >
-                {input}
-              </p>
+              <p style={{ color: cor }}>{input}</p>
             </article>
           </div>
         )}
@@ -87,19 +108,10 @@ export function Admin() {
           Salvar link
         </button>
       </form>
-       
 
-        <h2 className="font-bold text-white mb-4 text-2xl">Meus links</h2>
-        <article className="flex items-center justify-between w-11/12 max-w-xl rounded py-3 px-2 mb-2 select-none" 
-        style={{backgroundColor:"#2563EB", color: "white"}}>
-            <p> </p>
-               
-            <div>
-                 <button className="border border-dashed p-1 rounded ">
-                    <FiTrash size={18} color="white"/>
-                 </button>
-            </div>
-        </article>
+      <h2 className="font-bold text-white mb-4 text-2xl">
+        Meus links
+      </h2>
     </div>
   )
 }
