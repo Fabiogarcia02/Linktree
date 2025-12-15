@@ -1,8 +1,8 @@
-## Linktree Clone 🌲
+# Linktree Clone 🌲
 
 Uma aplicação web inspirada no Linktree, desenvolvida com React, Vite, Firebase e Tailwind CSS, que permite organizar e compartilhar múltiplos links em um único lugar. O objetivo é criar uma versão personalizada e open-source de um perfil de “link na bio” moderno e funcional.
 
-# 🔍 Sobre o Projeto
+## 🔍 Sobre o Projeto
 
 Este projeto serve como uma página de links centralizada — ideal para portfólios, perfis de redes sociais, currículos e mais — permitindo ao usuário:
 
@@ -27,7 +27,7 @@ Firestore	Banco de dados em tempo real
 React Router	Navegação entre páginas
 React Toastify	Notificações toast
 
-#🚀 Funcionalidades
+## 🚀 Funcionalidades
 
 ✔ Sistema de login e logout com Firebase Authentication
 ✔ Área administrativa para cadastrar novos links
