@@ -1,31 +1,51 @@
 import { Header } from "../../components/Header";
 import { Input } from "../../components/input";
-import { useState,FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { db } from "../../services/firebaseConnectio";
-import{addDoc, setDoc, getDoc, doc} from "firebase/firestore";
-import { toast } from "react-toastify"
+import { setDoc, getDoc, doc } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 export function Network() {
   const [facebook, setFacebook] = useState("");
   const [instagram, setInstagram] = useState("");
   const [linkedin, setLinkedin] = useState("");
 
-   function HandleRegistrer(e:FormEvent) {
-        e.preventDefault();
+  useEffect(() => {
+    async function loadLinks() {
+      try {
+        const docRef = doc(db, "social", "link");
+        const snapshot = await getDoc(docRef);
 
-         setDoc(doc(db,"social","link"),{
-            facebook:facebook,
-            instagram:instagram,
-            linkedin:linkedin
-   })
-        .then(()=>{
-            toast.success("Links salvos com sucesso!")
-        })
-        .catch((error)=>{
-            toast.error("Erro ao salvar os links!")
-            console.log(error)
-        })
-}
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setFacebook(data.facebook || "");
+          setInstagram(data.instagram || "");
+          setLinkedin(data.linkedin || "");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    loadLinks();
+  }, []);
+
+  function handleRegister(e: FormEvent) {
+    e.preventDefault();
+
+    setDoc(doc(db, "social", "link"), {
+      facebook,
+      instagram,
+      linkedin,
+    })
+      .then(() => {
+        toast.success("Links salvos com sucesso!");
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Erro ao salvar os links!");
+      });
+  }
 
   return (
     <div className="flex flex-col items-center min-h-screen pb-7 px-2">
@@ -35,8 +55,10 @@ export function Network() {
         Minhas redes sociais
       </h1>
 
-      <form onSubmit={HandleRegistrer}
-      className="flex flex-col max-w-xl w-full">
+      <form
+        onSubmit={handleRegister}
+        className="flex flex-col max-w-xl w-full"
+      >
         <label className="text-white font-medium mt-2 mb-2">
           Link do Facebook
         </label>
@@ -67,12 +89,13 @@ export function Network() {
           onChange={(event) => setLinkedin(event.target.value)}
         />
 
-        <button className="text-white bg-blue-600 h-10 rounded-md flex items-center justify-center mb-7 ">
-         Salvar Links
-       </button>
-
+        <button
+          type="submit"
+          className="text-white bg-blue-600 h-10 rounded-md flex items-center justify-center mb-7"
+        >
+          Salvar Links
+        </button>
       </form>
- 
     </div>
   );
 }
