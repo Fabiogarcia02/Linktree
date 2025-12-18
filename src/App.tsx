@@ -3,7 +3,7 @@ import { Home } from "./pages/home"
 import { Admin } from "./pages/admin"
 import { Loguin } from "./pages/Loguin"
 import { Network } from "./pages/network"
-import { Private } from "./routes/private"
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -15,7 +15,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <Private> <Admin /> </Private>
+    element: <Admin />   // 🔥 LIBERADO
   },
   {
     path: "/network",

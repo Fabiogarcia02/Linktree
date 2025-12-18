@@ -1,7 +1,6 @@
 import { Header } from "../../components/Header"
 import { Input } from "../../components/input"
 import { useState, type FormEvent } from "react"
-import { FiTrash } from "react-icons/fi"
 import { db } from "../../services/firebaseConnectio"
 import { toast } from "react-toastify"
 import { addDoc, collection } from "firebase/firestore"
@@ -12,7 +11,7 @@ export function Admin() {
   const [cor, setCor] = useState("#ffffff")
   const [backgroundcolor, setBackgroundcolor] = useState("#18181b")
 
-  async function handleRegister(e: FormEvent) {
+  function handleRegister(e: FormEvent) {
     e.preventDefault()
 
     if (input === "" || url === "") {
@@ -20,21 +19,22 @@ export function Admin() {
       return
     }
 
-    try {
-      await addDoc(collection(db, "links"), {
-        name: input,
-        url,
-        bg: backgroundcolor,
-        color: cor,
-        created: new Date()
+    addDoc(collection(db, "links"), {
+      name: input,
+      url: url,
+      bg: backgroundcolor,
+      color: cor,
+      created: new Date()
+    })
+      .then(() => {
+        setInput("")
+        setUrl("")
+        toast.success("Cadastro realizado com sucesso!")
       })
-
-      setInput("")
-      setUrl("")
-      toast.success("Cadastro realizado com sucesso!")
-    } catch (error) {
-      toast.error("Erro ao cadastrar link")
-    }
+      .catch((error) => {
+        console.error(error)
+        toast.error("Erro ao cadastrar link")
+      })
   }
 
   return (

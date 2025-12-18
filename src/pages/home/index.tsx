@@ -5,7 +5,7 @@ export function Home() {
   return (
     <div className="flex flex-col w-full py-4 items-center justify-center">
       <h1 className="text-3xl md:text-4xl font-bold text-white mt-20">
-        Fábio Garcia
+        Free Linktree
       </h1>
 
       <span className="text-gray-50 mb-5 mt-3">
