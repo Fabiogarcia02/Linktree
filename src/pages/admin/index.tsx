@@ -3,16 +3,25 @@ import { Input } from "../../components/input"
 import { useEffect, useState, type FormEvent } from "react"
 import { db } from "../../services/firebaseConnectio"
 import { toast } from "react-toastify"
-import { addDoc, collection,  onSnapshot, query, orderBy,doc, deleteDoc } from "firebase/firestore"
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  doc,
+  deleteDoc
+} from "firebase/firestore"
 import { FiTrash } from "react-icons/fi"
- interface ListaProps{
-   id: string;
-   name:string;
-   url:string;
-   bg:string;
-   color:string;
- }
- 
+
+interface ListaProps {
+  id: string
+  name: string
+  url: string
+  bg: string
+  color: string
+}
+
 export function Admin() {
   const [input, setInput] = useState("")
   const [url, setUrl] = useState("")
@@ -20,35 +29,34 @@ export function Admin() {
   const [backgroundcolor, setBackgroundcolor] = useState("#18181b")
   const [links, setLinks] = useState<ListaProps[]>([])
 
-   useEffect(() => {  //manipulando os dados por estado
-    const linksRef = collection(db, "links");
-    const queryRef = query(linksRef, orderBy("created", "asc"));
-    const unsubmit = onSnapshot(queryRef,(snapshot)=>{
+  useEffect(() => {
+    const linksRef = collection(db, "links")
+    const queryRef = query(linksRef, orderBy("created", "asc"))
 
-      let lista=[] as ListaProps[];
+    const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+      let lista: ListaProps[] = []
 
-      snapshot.forEach((doc)=>{
+      snapshot.forEach((document) => {
         lista.push({
-          id:doc.id,
-          ...doc.data().name,
-          url:doc.data().url, //monitrorando os dados do banco em tempo real, como um observer
-          bg:doc.data().bg,
-          color:doc.data().color,
+          id: document.id,
+          name: document.data().name,
+          url: document.data().url,
+          bg: document.data().bg,
+          color: document.data().color
         })
-      });
-       setLinks(lista); //renderizando no react
-    })
-     
-     
-     async function handleDeletelink(id:string){
-       const docRef= doc(db,"links",id);
-        await deleteDoc(docRef);
-        toast.success("Link deletado com sucesso!")
-      }
-     
-        return()=> unsubmit(); //parando a monitoração
-   },[])
+      })
 
+      setLinks(lista)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  async function handleDeletelink(id: string) {
+    const docRef = doc(db, "links", id)
+    await deleteDoc(docRef)
+    toast.success("Link deletado com sucesso!")
+  }
 
   function handleRegister(e: FormEvent) {
     e.preventDefault()
@@ -125,21 +133,6 @@ export function Admin() {
           </div>
         </section>
 
-        {input && (
-          <div className="flex flex-col items-center mb-7 p-2 border border-gray-100/25 rounded-md">
-            <label className="text-white font-medium mb-2">
-              Veja como está ficando
-            </label>
-
-            <article
-              className="w-11/12 max-w-lg flex justify-center rounded px-1 py-3"
-              style={{ backgroundColor: backgroundcolor }}
-            >
-              <p style={{ color: cor }}>{input}</p>
-            </article>
-          </div>
-        )}
-
         <button
           type="submit"
           className="mb-7 bg-blue-400 h-9 rounded-md text-white font-medium"
@@ -152,7 +145,7 @@ export function Admin() {
         Meus links
       </h2>
 
-{links.map((link) => (
+      {links.map((link) => (
         <article
           key={link.id}
           className="flex items-center justify-between w-11/12 max-w-xl rounded py-3 px-2 mb-2 select-none"
@@ -161,10 +154,13 @@ export function Admin() {
           <p>{link.name}</p>
 
           <button
-           onClick={()=> handleDeletelink(link.id)}
-
-            className="border border-dashed p-1 rounded bg-neutral-900">
+            onClick={() => handleDeletelink(link.id)}
+            className="border border-dashed p-1 rounded bg-neutral-900"
+          >
             <FiTrash size={19} color="#fff" />
           </button>
         </article>
-))}
+      ))}
+    </div>
+  )
+}
