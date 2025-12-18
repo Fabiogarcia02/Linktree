@@ -1,15 +1,46 @@
 import { Header } from "../../components/Header"
 import { Input } from "../../components/input"
-import { useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { db } from "../../services/firebaseConnectio"
 import { toast } from "react-toastify"
-import { addDoc, collection } from "firebase/firestore"
+import { addDoc, collection,  onSnapshot, query, orderBy,doc, deleteDoc } from "firebase/firestore"
 
+ interface ListaProps{
+   id: string;
+   name:string;
+   url:string;
+   bg:string;
+   color:string;
+ }
+ 
 export function Admin() {
   const [input, setInput] = useState("")
   const [url, setUrl] = useState("")
   const [cor, setCor] = useState("#ffffff")
   const [backgroundcolor, setBackgroundcolor] = useState("#18181b")
+  const [links, setLinks] = useState<ListaProps[]>([])
+
+   useEffect(() => {  //manipulando os dados por estado
+    const linksRef = collection(db, "links");
+    const queryRef = query(linksRef, orderBy("created", "asc"));
+    const unsubmit = onSnapshot(queryRef,(snapshot)=>{
+
+      let lista=[] as ListaProps[];
+
+      snapshot.forEach((doc)=>{
+        lista.push({
+          id:doc.id,
+          ...doc.data().name,
+          url:doc.data().url, //monitrorando os dados do banco em tempo real, como um observer
+          bg:doc.data().bg,
+          color:doc.data().color,
+        })
+      });
+       setLinks(lista); //renderizando no react
+    })
+        return()=> unsubmit(); //parando a monitoração
+   },[])
+
 
   function handleRegister(e: FormEvent) {
     e.preventDefault()
