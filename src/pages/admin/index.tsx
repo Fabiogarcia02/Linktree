@@ -38,6 +38,14 @@ export function Admin() {
       });
        setLinks(lista); //renderizando no react
     })
+     
+     
+     async function handleDeletelink(id:string){
+       const docRef= doc(db,"links",id);
+        await deleteDoc(docRef);
+        toast.success("Link deletado com sucesso!")
+      }
+     
         return()=> unsubmit(); //parando a monitoração
    },[])
 
@@ -152,7 +160,10 @@ export function Admin() {
         >
           <p>{link.name}</p>
 
-          <button className="border border-dashed p-1 rounded bg-neutral-900">
+          <button
+           onClick={()=> handleDeletelink(link.id)}
+
+            className="border border-dashed p-1 rounded bg-neutral-900">
             <FiTrash size={19} color="#fff" />
           </button>
         </article>
