@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react"
 import { db } from "../../services/firebaseConnectio"
 import { toast } from "react-toastify"
 import { addDoc, collection,  onSnapshot, query, orderBy,doc, deleteDoc } from "firebase/firestore"
-
+import { FiTrash } from "react-icons/fi"
  interface ListaProps{
    id: string;
    name:string;
@@ -143,6 +143,17 @@ export function Admin() {
       <h2 className="font-bold text-white mb-4 text-2xl">
         Meus links
       </h2>
-    </div>
-  )
-}
+
+{links.map((link) => (
+        <article
+          key={link.id}
+          className="flex items-center justify-between w-11/12 max-w-xl rounded py-3 px-2 mb-2 select-none"
+          style={{ backgroundColor: link.bg, color: link.color }}
+        >
+          <p>{link.name}</p>
+
+          <button className="border border-dashed p-1 rounded bg-neutral-900">
+            <FiTrash size={19} color="#fff" />
+          </button>
+        </article>
+))}
