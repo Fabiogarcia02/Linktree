@@ -1,7 +1,7 @@
 import { Header } from "../../components/Header";
 import { Input } from "../../components/input";
 import { useState, useEffect, FormEvent } from "react";
-import { db, auth } from "../../services/firebaseConnectio";
+import { db } from "../../services/firebaseConnectio";
 import { setDoc, doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 
