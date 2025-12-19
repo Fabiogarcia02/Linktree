@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface SocialProps {
   url: string
@@ -6,6 +6,8 @@ interface SocialProps {
 }
 
 export function Social({ url, children }: SocialProps) {
+  if (!url) return null
+
   return (
     <a
       href={url}

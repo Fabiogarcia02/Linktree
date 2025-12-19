@@ -21,11 +21,19 @@ interface SocialProps {
 
 export function Home() {
   const [links, setLinks] = useState<LinksProps[]>([]);
-  const [social, setSocial] = useState<SocialProps | null>(null);
+  
+  // Fallback local para redes sociais
+  const [social, setSocial] = useState<SocialProps>({
+    instagram: "https://instagram.com/teste",
+    facebook: "https://facebook.com/teste",
+    linkedin: "https://linkedin.com/in/teste",
+    github: "https://github.com/teste",
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🔗 Atualização em tempo real dos links
+    // Atualização em tempo real dos links
     const unsubscribeLinks = onSnapshot(collection(db, "links"), (snapshot) => {
       const linksList: LinksProps[] = [];
       snapshot.forEach((doc) => {
@@ -41,17 +49,15 @@ export function Home() {
       setLoading(false);
     });
 
-    // 🌐 Atualização em tempo real das redes sociais
+    // Atualização em tempo real das redes sociais
     const socialRef = doc(db, "social", "link");
     const unsubscribeSocial = onSnapshot(socialRef, (snapshot) => {
+      console.log("Social snapshot:", snapshot.data());
       if (snapshot.exists()) {
         setSocial(snapshot.data() as SocialProps);
-      } else {
-        setSocial(null);
       }
     });
 
-    // Cleanup
     return () => {
       unsubscribeLinks();
       unsubscribeSocial();
@@ -68,9 +74,9 @@ export function Home() {
 
   return (
     <div className="flex flex-col w-full py-6 items-center justify-center">
-  <h1 className="text-3xl md:text-4xl font-bold mt-16 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-  Free Linktree
-</h1>
+      <h1 className="text-3xl md:text-4xl font-bold mt-16 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+        Free Linktree
+      </h1>
 
       <span className="text-gray-300 mb-6 mt-3">Veja meus links 👇</span>
 
@@ -92,38 +98,55 @@ export function Home() {
           </section>
         ))}
 
-        {/* 🌐 REDES SOCIAIS */}
-        {social && Object.keys(social).length > 0 && (
-          <footer className="flex justify-center gap-6 mt-8">
+        {/* Botão "Gerenciar links" mais estilizado */}
+        <a
+          href="/admin"
+          className="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
+        >
+          ➕ Gerenciar links
+        </a>
+
+        {/* 🌐 REDES SOCIAIS abaixo do botão */}
+        {social ? (
+          <footer className="flex justify-center gap-6 mt-6">
             {social.instagram && (
               <Social url={social.instagram}>
-                <FaInstagram size={32} color="#fff" />
+                <FaInstagram
+                  size={36}
+                  color="#fff"
+                  className="hover:text-pink-500 transform hover:scale-110 transition duration-200"
+                />
               </Social>
             )}
             {social.facebook && (
               <Social url={social.facebook}>
-                <FaFacebook size={32} color="#fff" />
+                <FaFacebook
+                  size={36}
+                  color="#fff"
+                  className="hover:text-blue-600 transform hover:scale-110 transition duration-200"
+                />
               </Social>
             )}
             {social.github && (
               <Social url={social.github}>
-                <FaGithub size={32} color="#fff" />
+                <FaGithub
+                  size={36}
+                  color="#fff"
+                  className="hover:text-gray-400 transform hover:scale-110 transition duration-200"
+                />
               </Social>
             )}
             {social.linkedin && (
               <Social url={social.linkedin}>
-                <FaLinkedin size={32} color="#fff" />
+                <FaLinkedin
+                  size={36}
+                  color="#fff"
+                  className="hover:text-blue-500 transform hover:scale-110 transition duration-200"
+                />
               </Social>
             )}
           </footer>
-        )}
-
-        <a
-          href="/admin"
-          className="mt-6 px-4 py-2 rounded-md border border-gray-500 text-gray-300 hover:bg-gray-700 transition"
-        >
-          ➕ Gerenciar links
-        </a>
+        ) : null}
       </main>
     </div>
   );
