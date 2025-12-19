@@ -8,24 +8,49 @@ export function Header() {
     try {
       await signOut(auth);
       console.log("Logout realizado com sucesso!");
-      // Aqui você pode redirecionar para a página de login, se quiser
     } catch (error) {
       console.error("Erro ao deslogar:", error);
     }
   }
 
   return (
-    <header className="w-full max-w-2xl mt-4 px-1">
-      <nav className="w-full bg-white h-12 flex items-center justify-between rounded-md px-3">
-        <div className="flex gap-4 font-medium">
-          <Link to="/">Home</Link>
-          <Link to="/admin">Login</Link>
-          <Link to="/">Links</Link>
-          <Link to="/networks">Redes sociais</Link>
+    <header className="w-full bg-gray-900 shadow-md">
+      <nav className="w-full flex items-center justify-between max-w-full px-6 py-2 md:py-3">
+        {/* Links centralizados */}
+        <div className="flex-1 flex justify-center gap-10 font-semibold text-white text-sm md:text-base">
+          <Link
+            to="/"
+            className="relative group px-2 py-1 hover:text-yellow-400 transition-colors duration-300"
+          >
+            Home
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-400 transition-all group-hover:w-full"></span>
+          </Link>
+          <Link
+            to="/admin"
+            className="relative group px-2 py-1 hover:text-yellow-400 transition-colors duration-300"
+          >
+            Links
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-400 transition-all group-hover:w-full"></span>
+          </Link>
+          <Link
+            to="/network"
+            className="relative group px-2 py-1 hover:text-yellow-400 transition-colors duration-300"
+          >
+            Redes
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-400 transition-all group-hover:w-full"></span>
+          </Link>
         </div>
-        <button onClick={handleLogout} className="p-0 m-0">
-  <BiLogOut size={28} color="#db2629" />
-</button>
+
+        {/* Botão de logout à direita */}
+        <div className="flex justify-end flex-1">
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center p-1 md:p-2 rounded-full bg-red-600 hover:bg-red-500 text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110"
+            title="Sair"
+          >
+            <BiLogOut size={24} />
+          </button>
+        </div>
       </nav>
     </header>
   );

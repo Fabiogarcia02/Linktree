@@ -1,7 +1,7 @@
 import { Header } from "../../components/Header";
 import { Input } from "../../components/input";
 import { useState, useEffect, FormEvent } from "react";
-import { db } from "../../services/firebaseConnectio";
+import { db, auth } from "../../services/firebaseConnectio";
 import { setDoc, doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 
@@ -9,6 +9,7 @@ export function Network() {
   const [facebook, setFacebook] = useState("");
   const [instagram, setInstagram] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [github, setGithub] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,10 +24,12 @@ export function Network() {
           setFacebook(data.facebook || "");
           setInstagram(data.instagram || "");
           setLinkedin(data.linkedin || "");
+          setGithub(data.github || "");
         } else {
           setFacebook("");
           setInstagram("");
           setLinkedin("");
+          setGithub("");
         }
         setLoading(false);
       },
@@ -46,6 +49,7 @@ export function Network() {
       facebook,
       instagram,
       linkedin,
+      github,
     })
       .then(() => {
         toast.success("Links salvos com sucesso!");
@@ -97,9 +101,17 @@ export function Network() {
           onChange={(event) => setLinkedin(event.target.value)}
         />
 
+        <label className="text-white font-medium mt-2 mb-2">Link do GitHub</label>
+        <Input
+          type="url"
+          placeholder="Digite a URL do GitHub..."
+          value={github}
+          onChange={(event) => setGithub(event.target.value)}
+        />
+
         <button
           type="submit"
-          className="text-white bg-blue-600 h-10 rounded-md flex items-center justify-center mb-7"
+          className="text-white bg-blue-950 h-10 rounded-md flex items-center justify-center mb-7"
         >
           Salvar Links
         </button>

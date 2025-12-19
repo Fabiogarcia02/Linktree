@@ -1,7 +1,9 @@
 import { Social } from "../../components/social";
 import { FaInstagram, FaGithub, FaLinkedin, FaFacebook } from "react-icons/fa";
-import { db } from "../../services/firebaseConnectio";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../../services/firebaseConnectio";
+import { collection, doc, onSnapshot, query, orderBy } from "firebase/firestore";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 interface LinksProps {
@@ -21,48 +23,62 @@ interface SocialProps {
 
 export function Home() {
   const [links, setLinks] = useState<LinksProps[]>([]);
-  
-  // Fallback local para redes sociais
-  const [social, setSocial] = useState<SocialProps>({
-    instagram: "https://instagram.com/teste",
-    facebook: "https://facebook.com/teste",
-    linkedin: "https://linkedin.com/in/teste",
-    github: "https://github.com/teste",
-  });
-
+  const [social, setSocial] = useState<SocialProps | null>(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
+  // Monitorar estado de autenticação
   useEffect(() => {
-    // Atualização em tempo real dos links
-    const unsubscribeLinks = onSnapshot(collection(db, "links"), (snapshot) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  // Carregar links do usuário logado e redes sociais globais
+  useEffect(() => {
+    // Carregar redes sociais (visível para todos)
+    const socialRef = doc(db, "social", "link");
+    const unsubscribeSocial = onSnapshot(socialRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setSocial(snapshot.data() as SocialProps);
+      } else {
+        setSocial(null);
+      }
+    });
+
+    // Se não houver usuário logado, não carrega links
+    if (!user) {
+      setLoading(false);
+      return () => unsubscribeSocial();
+    }
+
+    // Carregar links do usuário logado
+    const linksRef = collection(db, "links");
+    const queryRef = query(linksRef, orderBy("created", "asc"));
+    const unsubscribeLinks = onSnapshot(queryRef, (snapshot) => {
       const linksList: LinksProps[] = [];
       snapshot.forEach((doc) => {
-        linksList.push({
-          id: doc.id,
-          name: doc.data().name,
-          url: doc.data().url,
-          bg: doc.data().bg,
-          color: doc.data().color,
-        });
+        const data = doc.data();
+        if (data.userId === user.uid) {
+          linksList.push({
+            id: doc.id,
+            name: data.name,
+            url: data.url,
+            bg: data.bg,
+            color: data.color,
+          });
+        }
       });
       setLinks(linksList);
       setLoading(false);
     });
 
-    // Atualização em tempo real das redes sociais
-    const socialRef = doc(db, "social", "link");
-    const unsubscribeSocial = onSnapshot(socialRef, (snapshot) => {
-      console.log("Social snapshot:", snapshot.data());
-      if (snapshot.exists()) {
-        setSocial(snapshot.data() as SocialProps);
-      }
-    });
-
     return () => {
-      unsubscribeLinks();
-      unsubscribeSocial();
+      unsubscribeLinks && unsubscribeLinks();
+      unsubscribeSocial && unsubscribeSocial();
     };
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -81,33 +97,59 @@ export function Home() {
       <span className="text-gray-300 mb-6 mt-3">Veja meus links 👇</span>
 
       <main className="flex flex-col w-11/12 max-w-xl text-center">
-        {/* 🔗 LINKS */}
-        {links.length === 0 && <p className="text-gray-400">Nenhum link cadastrado</p>}
+        {!user ? (
+          <div className="flex flex-col items-center mt-10">
+            <p className="text-gray-400 mb-4">
+              Faça login para ver seus links.
+            </p>
+            <Link
+              to="/admin"
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
+            >
+              🔑 Login
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* 🔗 LINKS */}
+            {links.length === 0 ? (
+              <p className="text-gray-400 mb-6">Nenhum link cadastrado</p>
+            ) : (
+              links.map((link) => (
+                <section
+                  key={link.id}
+                  className="mb-4 w-full py-4 rounded-xl shadow-md transition-transform hover:scale-105"
+                  style={{ backgroundColor: link.bg }}
+                >
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <p
+                      className="text-base md:text-lg font-semibold"
+                      style={{ color: link.color }}
+                    >
+                      {link.name}
+                    </p>
+                  </a>
+                </section>
+              ))
+            )}
 
-        {links.map((link) => (
-          <section
-            key={link.id}
-            className="mb-4 w-full py-4 rounded-xl shadow-md transition-transform hover:scale-105"
-            style={{ backgroundColor: link.bg }}
-          >
-            <a href={link.url} target="_blank" rel="noopener noreferrer" className="block">
-              <p className="text-base md:text-lg font-semibold" style={{ color: link.color }}>
-                {link.name}
-              </p>
-            </a>
-          </section>
-        ))}
+            {/* Botão "Gerenciar links" */}
+            <Link
+              to="/admin"
+              className="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
+            >
+              ➕ Gerenciar links
+            </Link>
+          </>
+        )}
 
-        {/* Botão "Gerenciar links" mais estilizado */}
-        <a
-          href="/admin"
-          className="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
-        >
-          ➕ Gerenciar links
-        </a>
-
-        {/* 🌐 REDES SOCIAIS abaixo do botão */}
-        {social ? (
+        {/* 🌐 REDES SOCIAIS - visíveis para todos */}
+        {social && Object.keys(social).length > 0 && (
           <footer className="flex justify-center gap-6 mt-6">
             {social.instagram && (
               <Social url={social.instagram}>
@@ -146,7 +188,7 @@ export function Home() {
               </Social>
             )}
           </footer>
-        ) : null}
+        )}
       </main>
     </div>
   );
