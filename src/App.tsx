@@ -3,6 +3,9 @@ import { Home } from "./pages/home"
 import { Admin } from "./pages/admin"
 import { Loguin } from "./pages/Loguin"
 import { Network } from "./pages/network"
+import { Private } from "./routes/private"
+import { Error } from "./pages/error"
+import { Cadastro } from "./pages/cadastro" 
 
 const router = createBrowserRouter([
   {
@@ -14,12 +17,24 @@ const router = createBrowserRouter([
     element: <Loguin />
   },
   {
+    path: "/cadastro", 
+    element: <Cadastro />
+  },
+  {
     path: "/admin",
-    element: <Admin />   // 🔥 LIBERADO
+    element: (
+      <Private>
+        <Admin />
+      </Private>
+    )
   },
   {
     path: "/network",
     element: <Network />
+  },
+  {
+    path: "*",
+    element: <Error />
   }
 ])
 

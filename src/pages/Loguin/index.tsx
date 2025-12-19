@@ -62,6 +62,16 @@ export function Loguin() {
         >
           Acessar
         </button>
+           <p className="text-gray-300 text-sm mt-4 text-center">
+  Ainda não tem conta?{" "}
+  <a
+    href="/cadastro"
+    className="text-blue-400 hover:underline"
+  >
+    Criar conta
+  </a>
+</p>
+
       </form>
     </div>
   )

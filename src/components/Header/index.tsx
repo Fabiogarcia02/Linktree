@@ -13,7 +13,7 @@ import{signOut} from 'firebase/auth'
               <nav className='w-full bg-white h-12 flex items-center justify-between rounded-md px-3'>
                  <div className='flex gap-4 font-medium'>
                     <Link to= "/">Home</Link>
-                       <Link to= "/admin">Home</Link>
+                       <Link to= "/admin">Loguin</Link>
                           <Link to= "/">Links</Link>
                              <Link to= "/networks">Redes sociais</Link>
                  </div>

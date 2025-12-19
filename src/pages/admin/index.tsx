@@ -28,6 +28,24 @@ export function Admin() {
   const [cor, setCor] = useState("#ffffff")
   const [backgroundcolor, setBackgroundcolor] = useState("#18181b")
   const [links, setLinks] = useState<ListaProps[]>([])
+  const [preview, setPreview] = useState<ListaProps>({
+    id: "",
+    name: "",
+    url: "",
+    bg: "#18181b",
+    color: "#ffffff"
+  })
+
+  // Atualiza preview sempre que input, cor ou fundo mudam
+  useEffect(() => {
+    setPreview({
+      id: "preview",
+      name: input || "Nome do link",
+      url: url || "#",
+      bg: backgroundcolor,
+      color: cor
+    })
+  }, [input, url, cor, backgroundcolor])
 
   useEffect(() => {
     const linksRef = collection(db, "links")
@@ -88,6 +106,7 @@ export function Admin() {
     <div className="flex flex-col items-center min-h-screen pb-7 px-2">
       <Header />
 
+      {/* Formulário */}
       <form
         onSubmit={handleRegister}
         className="flex flex-col mt-8 mb-3 w-full max-w-xl"
@@ -111,20 +130,16 @@ export function Admin() {
           onChange={(e) => setUrl(e.target.value)}
         />
 
-        <section className="flex my-4 gap-5">
+        <section className="flex my-4 gap-5 items-center">
           <div className="flex gap-4 items-center">
-            <label className="text-white font-medium">
-              Cor do link
-            </label>
+            <label className="text-white font-medium">Cor do link</label>
             <input
               type="color"
               value={cor}
               onChange={(e) => setCor(e.target.value)}
             />
 
-            <label className="text-white font-medium">
-              Fundo do link
-            </label>
+            <label className="text-white font-medium">Fundo do link</label>
             <input
               type="color"
               value={backgroundcolor}
@@ -141,21 +156,38 @@ export function Admin() {
         </button>
       </form>
 
-      <h2 className="font-bold text-white mb-4 text-2xl">
+      {/* Preview em tempo real */}
+      <div className="mb-6 w-11/12 max-w-xl">
+        <h3 className="text-white font-semibold mb-2">Pré-visualização:</h3>
+        <a
+          href={preview.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block py-3 px-4 rounded select-none shadow-md transition-transform hover:scale-105"
+          style={{ backgroundColor: preview.bg, color: preview.color }}
+        >
+          {preview.name}
+        </a>
+      </div>
+
+      {/* Lista de links salvos */}
+      <h2 className="font-bold text-2xl mb-4 text-white">
         Meus links
       </h2>
 
       {links.map((link) => (
         <article
           key={link.id}
-          className="flex items-center justify-between w-11/12 max-w-xl rounded py-3 px-2 mb-2 select-none"
+          className="flex items-center justify-between w-11/12 max-w-xl rounded py-3 px-2 mb-2 select-none shadow-md transition-transform hover:scale-105"
           style={{ backgroundColor: link.bg, color: link.color }}
         >
-          <p>{link.name}</p>
+          <a href={link.url} target="_blank" rel="noopener noreferrer">
+            {link.name}
+          </a>
 
           <button
             onClick={() => handleDeletelink(link.id)}
-            className="border border-dashed p-1 rounded bg-neutral-900"
+            className="border border-dashed p-1 rounded bg-neutral-900 hover:bg-neutral-800 transition"
           >
             <FiTrash size={19} color="#fff" />
           </button>

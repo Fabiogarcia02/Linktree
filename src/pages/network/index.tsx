@@ -2,32 +2,41 @@ import { Header } from "../../components/Header";
 import { Input } from "../../components/input";
 import { useState, useEffect, FormEvent } from "react";
 import { db } from "../../services/firebaseConnectio";
-import { setDoc, getDoc, doc } from "firebase/firestore";
+import { setDoc, doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 
 export function Network() {
   const [facebook, setFacebook] = useState("");
   const [instagram, setInstagram] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadLinks() {
-      try {
-        const docRef = doc(db, "social", "link");
-        const snapshot = await getDoc(docRef);
+    const docRef = doc(db, "social", "link");
 
+    // Atualização em tempo real
+    const unsubscribe = onSnapshot(
+      docRef,
+      (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
           setFacebook(data.facebook || "");
           setInstagram(data.instagram || "");
           setLinkedin(data.linkedin || "");
+        } else {
+          setFacebook("");
+          setInstagram("");
+          setLinkedin("");
         }
-      } catch (error) {
-        console.log(error);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Erro ao carregar links em tempo real:", error);
+        setLoading(false);
       }
-    }
+    );
 
-    loadLinks();
+    return () => unsubscribe();
   }, []);
 
   function handleRegister(e: FormEvent) {
@@ -47,6 +56,14 @@ export function Network() {
       });
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-white">
+        Carregando links...
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center min-h-screen pb-7 px-2">
       <Header />
@@ -55,13 +72,8 @@ export function Network() {
         Minhas redes sociais
       </h1>
 
-      <form
-        onSubmit={handleRegister}
-        className="flex flex-col max-w-xl w-full"
-      >
-        <label className="text-white font-medium mt-2 mb-2">
-          Link do Facebook
-        </label>
+      <form onSubmit={handleRegister} className="flex flex-col max-w-xl w-full">
+        <label className="text-white font-medium mt-2 mb-2">Link do Facebook</label>
         <Input
           type="url"
           placeholder="Digite a URL do Facebook..."
@@ -69,9 +81,7 @@ export function Network() {
           onChange={(event) => setFacebook(event.target.value)}
         />
 
-        <label className="text-white font-medium mt-2 mb-2">
-          Link do Instagram
-        </label>
+        <label className="text-white font-medium mt-2 mb-2">Link do Instagram</label>
         <Input
           type="url"
           placeholder="Digite a URL do Instagram..."
@@ -79,9 +89,7 @@ export function Network() {
           onChange={(event) => setInstagram(event.target.value)}
         />
 
-        <label className="text-white font-medium mt-2 mb-2">
-          Link do LinkedIn
-        </label>
+        <label className="text-white font-medium mt-2 mb-2">Link do LinkedIn</label>
         <Input
           type="url"
           placeholder="Digite a URL do LinkedIn..."
