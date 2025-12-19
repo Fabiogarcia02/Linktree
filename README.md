@@ -1,4 +1,12 @@
 # Linktree Clone 🌲
+<img width="1579" height="897" alt="image" src="https://github.com/user-attachments/assets/17fe0dc7-3b9f-4dfd-9266-f6e6883e7634" />
+<img width="739" height="410" alt="image" src="https://github.com/user-attachments/assets/320aa834-72f8-466e-86b0-604eb92cc2b8" />
+<img width="809" height="509" alt="image" src="https://github.com/user-attachments/assets/f92ecfb5-f005-4e42-b0d4-2a60cc142563" />
+<img width="1407" height="818" alt="image" src="https://github.com/user-attachments/assets/ab6fe906-4503-4913-8969-47b869772979" />
+
+
+
+
 
 Uma aplicação web inspirada no Linktree, desenvolvida com React, Vite, Firebase e Tailwind CSS, que permite organizar e compartilhar múltiplos links em um único lugar. O objetivo é criar uma versão personalizada e open-source de um perfil de “link na bio” moderno e funcional.
 
@@ -16,6 +24,8 @@ Armazenar links no Firestore em tempo real
 
 Essa ideia é semelhante a plataformas como Linktree, mas criada e controlada por você, sem dependência de serviços externos pagos. 
 GitHub
+
+ 
 
 🛠 Tecnologias Utilizadas
 Tecnologia	Uso
